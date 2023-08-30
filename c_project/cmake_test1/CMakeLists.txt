@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 2.8)
+project(CMake_Test)
+include_directories("./src")
+aux_source_directory(./src sayhello_src)
+add_executable(cmake_test ${sayhello_src} main.c)

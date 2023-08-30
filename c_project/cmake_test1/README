@@ -1,0 +1,9 @@
+
+多文件在不同目录下：
+    根目录 CMakeLists.txt: 
+        
+        cmake_minimum_required(VERSION 2.8)
+        project(CMake_Test)
+        include_directories("./src")                            //这个指令用于添加头文件查找路径
+        aux_source_directory(./src sayhello_src)                //将"./src"目录下的所有源文件保存到sayhello_src变量中       aux_source_directory(<dir> <variable>)
+        add_executable(cmake_test ${sayhello_src} main.c)       //编译

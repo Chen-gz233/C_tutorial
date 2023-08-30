@@ -1,0 +1,29 @@
+gcc ex21.c lib21.c dbg.h -o ex21
+/tmp/ccJgFr16.o: In function `main':
+ex21.c:(.text+0xa1): undefined reference to `dlopen'
+ex21.c:(.text+0xb1): undefined reference to `dlerror'
+ex21.c:(.text+0x125): undefined reference to `dlsym'
+ex21.c:(.text+0x135): undefined reference to `dlerror'
+ex21.c:(.text+0x227): undefined reference to `dlclose'
+collect2: error: ld returned 1 exit status
+
+
+GCC 编译报错
+
+缺乏对应的库
+
+尝试：
+    gcc -ldl ex21.c lib21.c dbg.h -o ex21
+
+    还是出现上面的同样的错误
+
+尝试：
+    gcc  ex21.c lib21.c dbg.h -ldl -o ex21
+    这样就可以通过了
+
+
+
+8.29日尝试写Makefile 
+        ./ex21 ./lib21 print_a_message "hello"
+        ./ex21 ./lib21.so uppercase "hello"
+        ./ex21 ./lib21.so lowercase "HELLO"

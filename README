@@ -1,0 +1,30 @@
+
+ 学习 C/C++文件夹
+
+学习使用Cmake  
+
+用于保存C/C++代码
+
+
+
+git 技巧：
+
+git init                                  # 初始化
+git add README.md                         # 添加文件
+git commit -m "添加 README.md 文件"        # 提交并备注信息
+
+# 提交到 Github
+
+git remote add origin git@github.com:xxx/xxxx.git
+
+git push -u origin master
+
+
+
+#ifndef  预处理功能三种（宏定义、文件包含、条件编译）
+
+#ifndef x                 //先测试x是否被宏定义过
+#define x
+          程序段1blabla~    //如果x没有被宏定义过,定义x,并编译程序段 1
+#endif   
+          程序段2blabla~     //如果x已经定义过了则编译程序段2的语句,“忽视”程序段 1

@@ -1,0 +1,11 @@
+笨办法学C (Learn C The Hard Way) 
+进入数据结构部分
+
+一个标准C/C++项目框架应该包含：
+                                LICENSE 
+                                Makefile        
+                                README.md       
+                                bin             
+                                build           
+                                src             
+                                tests

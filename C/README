@@ -1,0 +1,10 @@
+Learn C the hard way
+
+学习GCC 编译
+学习Cmake   编写 CMakeLists.txt 用于跨平台 自动化测试
+
+动态链接库： .a .so
+
+gcc xx.c -o xx
+
+
