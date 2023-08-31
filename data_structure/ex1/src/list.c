@@ -1,6 +1,7 @@
 #include "list.h"
 #include "dbg.h"
 
+
 List *List_create()
 {
     return calloc(1, sizeof(List));     //创建一个节点

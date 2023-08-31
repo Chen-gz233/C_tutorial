@@ -1,6 +1,14 @@
-CFLAGS=-g -O2 -Wall -Wextra -Isrc -rdynamic -DNDEBUG $(OPTFLAGS)
+SRC_DIR=./src
+LCTHW_DIR=$(SRC_DIR)
+BUILD_DIR=./build
+TESTS_DIR=./tests
+
+CC=gcc
+INCLUDES=-I$(SRC_DIR) -I$(LCTHW_DIR) 
+
+CFLAGS=-g -std=c99 -O2 -Wall -Wextra -Werror -Wno-unused-function -Wno-unused-parameter -rdynamic -DNDEBUG $(INCLUDES) $(OPTFLAGS)
 LIBS=-ldl $(OPTLIBS)
-PREFIX?=/usr/local
+
 
 #通过执行wildcard搜索在src/中所有*.c文件来动态创建SOURCES变量
 #你需要提供src/**/*.c和src/*.c以便GNU make能够包含src目录及其子目录的所有此类文件。
@@ -17,23 +25,27 @@ TARGET=build/libex1.a
 SO_TARGET=$(patsubst %.a,%.so,$(TARGET))
 
 # The Target Build
-all: $(TARGET) $(SO_TARGET) tests
-
-dev: CFLAGS=-g -Wall -Isrc -Wall -Wextra $(OPTFLAGS)
-dev: all
+all: target tests
+target: build $(TARGET) $(SO_TARGET)
 
 #向一个目标提供选项来为当前目标修改它们。这里我通过适用+=语法为库的构建添加了-fPIC
 $(TARGET): CFLAGS += -fPIC
 
 #这一真实目标首先创建build目录，之后编译所有OBJECTS。
-$(TARGET): build $(OBJECTS)
+$(TARGET):  $(OBJECTS)
 ## $@ $(OBJECTS)语法的意思是，将当前目标的名称放在这里，并把OBJECTS的内容放在后面。
 ## 这里$@的值为19行的$(TARGET)，它实际上为build/libYOUR_LIBRARY.a。
 	ar rcs $@ $(OBJECTS)			
 	ranlib $@
 
-$(SO_TARGET): $(TARGET) $(OBJECTS)
+$(SO_TARGET): $(OBJECTS)
 	$(CC) -shared -o $@ $(OBJECTS)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@ $(LIBS)
+
+$(TESTS_DIR)/%.tst: $(TESTS_DIR)/%.c
+	$(CC) $(CFLAGS) $< $(TARGET) -o $@ $(LIBS)
 
 build:
 	@mkdir -p build
@@ -41,27 +53,15 @@ build:
 
 # The Unit Tests
 .PHONY: tests
-tests: CFLAGS += $(TARGET)
+
 tests: $(TESTS)
 	sh ./tests/runtests.sh
 
-valgrind:
-	VALGRIND="valgrind --log-file=/tmp/valgrind-%p.log" $(MAKE)
 
 # The Cleaner
 clean:
-	rm -rf build $(OBJECTS) $(TESTS)
-	rm -f tests/tests.log
-	find . -name "*.gc*" -exec rm {} \;
-	rm -rf `find . -name "*.dSYM" -print`
+	rm -rf $(BUILD_DIR) || true
+	rm $(OBJECTS) || true
+	rm $(TESTS) || true
+	rm tests/tests.log || true
 
-# The Install
-install: all
-	install -d $(DESTDIR)/$(PREFIX)/lib/
-	install $(TARGET) $(DESTDIR)/$(PREFIX)/lib/
-
-# The Checker
-BADFUNCS='[^_.>a-zA-Z0-9](str(n?cpy|n?cat|xfrm|n?dup|str|pbrk|tok|_)|stpn?cpy|a?sn?printf|byte_)'
-check:
-	@echo Files with potentially dangerous functions.
-	@egrep $(BADFUNCS) $(SOURCES) || true

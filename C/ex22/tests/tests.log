@@ -1,0 +1,9 @@
+DEBUG tests/lib22_tests.c:71: ----- RUNNING: ./tests/lib22_tests
+DEBUG tests/lib22_tests.c:64: 
+----- test_dlopen
+DEBUG tests/lib22_tests.c:65: 
+----- test_functions
+DEBUG tests/lib22_tests.c:66: 
+----- test_failures
+DEBUG tests/lib22_tests.c:67: 
+----- test_dlclose

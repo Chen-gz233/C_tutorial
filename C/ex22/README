@@ -13,3 +13,28 @@ Makefile写的太抽象
  看了看，发现别人也是重新自己写的Makefile
  怀疑作者在炫技
  放弃
+
+
+ 2023.8.31
+今日思索再三，继续在github寻找LCTHW的原码
+发现可以运行的一个代码
+仔细对比发现是 Makefile中第二行代码改为LDLIBS=-ldl $(OPTLIBS) 即可
+
+不改则会报错：
+  $  cc -g -O2 -Wall -Wextra -Isrc -rdynamic -DNDEBUG  build/libYOUR_LIBRARY.a    tests/lib22_tests.c   -o tests/lib22_tests
+    
+    
+    /tmp/cc1iiaDU.o：在函数‘check_function’中：
+/home/chen/ysyx/C/ex22/tests/lib22_tests.c:11：对‘dlsym’未定义的引用
+/home/chen/ysyx/C/ex22/tests/lib22_tests.c:12：对‘dlerror’未定义的引用
+/tmp/cc1iiaDU.o：在函数‘test_dlopen’中：
+/home/chen/ysyx/C/ex22/tests/lib22_tests.c:30：对‘dlopen’未定义的引用
+/tmp/cc1iiaDU.o：在函数‘test_dlclose’中：
+/home/chen/ysyx/C/ex22/tests/lib22_tests.c:56：对‘dlclose’未定义的引用
+collect2: error: ld returned 1 exit status
+<内置>: recipe for target 'tests/lib22_tests' failed
+make: *** [tests/lib22_tests] Error 1
+
+
+改完 gcc 中出现ldl则不会报错：
+    cc -g -O2 -Wall -Wextra -Isrc -rdynamic -DNDEBUG  build/libYOUR_LIBRARY.a    tests/lib22_tests.c  -ldl  -o tests/lib22_tests
