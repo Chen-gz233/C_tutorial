@@ -1,13 +1,7 @@
-SRC_DIR=./src
-LCTHW_DIR=$(SRC_DIR)
-BUILD_DIR=./build
-TESTS_DIR=./tests
-
-CC=gcc
-INCLUDES=-I$(SRC_DIR) -I$(LCTHW_DIR) 
-
-CFLAGS=-g -std=c99 -O2 -Wall -Wextra -Werror -Wno-unused-function -Wno-unused-parameter -rdynamic -DNDEBUG $(INCLUDES) $(OPTFLAGS)
-LIBS=-ldl $(OPTLIBS)
+#CC=gcc
+CFLAGS=-g -O2 -Wall -Wextra -Isrc -rdynamic -DNDEBUG $(OPTFLAGS)
+LDLIBS=-ldl $(OPTLIBS)
+PREFIX?=/usr/local)
 
 
 #通过执行wildcard搜索在src/中所有*.c文件来动态创建SOURCES变量
@@ -21,31 +15,31 @@ OBJECTS=$(patsubst %.c,%.o,$(SOURCES))
 TEST_SRC=$(wildcard tests/*_tests.c)
 TESTS=$(patsubst %.c,%,$(TEST_SRC))
 
+PROGRAMS_SRC=$(wildcard bin/*.c)
+PROGRAMS=$(patsubst %.c,%,$(PROGRAMS_SRC))
+
 TARGET=build/libex1.a
 SO_TARGET=$(patsubst %.a,%.so,$(TARGET))
 
 # The Target Build
-all: target tests
-target: build $(TARGET) $(SO_TARGET)
+all: $(TARGET) $(SO_TARGET) tests $(PROGRAMS)
+dev: CFLAGS=-g -Wall -Isrc -Wall -Wextra $(OPTFLAGS)
+dev: all
 
 #向一个目标提供选项来为当前目标修改它们。这里我通过适用+=语法为库的构建添加了-fPIC
 $(TARGET): CFLAGS += -fPIC
 
 #这一真实目标首先创建build目录，之后编译所有OBJECTS。
-$(TARGET):  $(OBJECTS)
+$(TARGET): build $(OBJECTS)
 ## $@ $(OBJECTS)语法的意思是，将当前目标的名称放在这里，并把OBJECTS的内容放在后面。
 ## 这里$@的值为19行的$(TARGET)，它实际上为build/libYOUR_LIBRARY.a。
 	ar rcs $@ $(OBJECTS)			
 	ranlib $@
+$(PROGRAMS): LDLIBS += $(TARGET)
 
 $(SO_TARGET): $(OBJECTS)
 	$(CC) -shared -o $@ $(OBJECTS)
 
-%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@ $(LIBS)
-
-$(TESTS_DIR)/%.tst: $(TESTS_DIR)/%.c
-	$(CC) $(CFLAGS) $< $(TARGET) -o $@ $(LIBS)
 
 build:
 	@mkdir -p build
@@ -53,11 +47,12 @@ build:
 
 # The Unit Tests
 .PHONY: tests
-
+tests: LDLIBS += $(TARGET)
 tests: $(TESTS)
 	sh ./tests/runtests.sh
 
-
+valgrind:
+	VALGRIND="valgrind --log-file=/tmp/valgrind-%p.log" $(MAKE)
 # The Cleaner
 clean:
 	rm -rf $(BUILD_DIR) || true
