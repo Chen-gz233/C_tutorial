@@ -1,0 +1,7 @@
+DEBUG tests/ringbuffer_tests.c:72: ----- RUNNING: ./tests/ringbuffer_tests
+DEBUG tests/ringbuffer_tests.c:65: 
+----- test_create
+DEBUG tests/ringbuffer_tests.c:66: 
+----- test_read_write
+DEBUG tests/ringbuffer_tests.c:67: 
+----- test_destroy
